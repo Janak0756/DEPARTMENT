@@ -88,81 +88,66 @@ function createSkillModal() {
     
     document.body.insertAdjacentHTML('beforeend', modalHTML);
     
-    // Add event listeners for the modal
+    // Add modal events
     document.getElementById('closeSkillModal').addEventListener('click', closeSkillModal);
     document.getElementById('cancelSkillBtn').addEventListener('click', closeSkillModal);
     document.getElementById('saveSkillBtn').addEventListener('click', saveSkill);
     document.getElementById('deleteSkillBtn').addEventListener('click', deleteSkill);
-    
-    // Add real-time preview updates
+
     document.getElementById('skillName').addEventListener('input', updateSkillPreview);
     document.getElementById('skillLevel').addEventListener('change', updateSkillPreview);
 }
 
-// Update skill preview
+// Preview updater
 function updateSkillPreview() {
     const skillName = document.getElementById('skillName').value || 'Skill Name';
     const skillLevel = document.getElementById('skillLevel').value;
     
     document.getElementById('previewSkillName').textContent = skillName;
-    document.getElementById('previewSkillLevel').textContent = skillLevel.charAt(0).toUpperCase() + skillLevel.slice(1);
+    document.getElementById('previewSkillLevel').textContent =
+        skillLevel.charAt(0).toUpperCase() + skillLevel.slice(1);
 }
 
-// Open skill modal for adding new skill
+// Open add modal
 function openSkillModal() {
     editingSkill = null;
     const modal = document.getElementById('skillModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const saveBtn = document.getElementById('saveSkillBtn');
-    const deleteSection = document.getElementById('deleteSection');
-    
-    // Set modal for adding new skill
-    modalTitle.textContent = 'Add New Skill';
-    saveBtn.textContent = 'Add Skill';
-    deleteSection.style.display = 'none';
-    
-    // Reset form
+    document.getElementById('modalTitle').textContent = 'Add New Skill';
+    document.getElementById('saveSkillBtn').textContent = 'Add Skill';
+    document.getElementById('deleteSection').style.display = 'none';
+
     document.getElementById('skillName').value = '';
     document.getElementById('skillLevel').value = 'beginner';
     document.getElementById('skillCategory').value = 'programming';
+
     updateSkillPreview();
-    
     modal.style.display = 'flex';
 }
 
-// Open skill modal for editing existing skill
+// Open edit modal
 function openEditSkillModal(skillElement) {
     editingSkill = skillElement;
+
     const modal = document.getElementById('skillModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const saveBtn = document.getElementById('saveSkillBtn');
-    const deleteSection = document.getElementById('deleteSection');
-    
-    // Set modal for editing skill
-    modalTitle.textContent = 'Edit Skill';
-    saveBtn.textContent = 'Update Skill';
-    deleteSection.style.display = 'block';
-    
-    // Extract current skill data
-    const skillNameElement = skillElement.childNodes[0];
-    const skillName = skillNameElement.textContent.trim();
-    const skillLevelBadge = skillElement.querySelector('.skill-level-badge');
-    const skillLevel = skillLevelBadge ? skillLevelBadge.textContent.toLowerCase() : 'intermediate';
-    const category = skillElement.getAttribute('data-category') || 'programming';
-    
-    // Populate form with current data
-    document.getElementById('skillName').value = skillName;
-    document.getElementById('skillLevel').value = skillLevel;
+    document.getElementById('modalTitle').textContent = 'Edit Skill';
+    document.getElementById('saveSkillBtn').textContent = 'Update Skill';
+    document.getElementById('deleteSection').style.display = 'block';
+
+    const name = skillElement.childNodes[0].textContent.trim();
+    const level = skillElement.querySelector('.skill-level-badge').textContent.toLowerCase();
+    const category = skillElement.getAttribute('data-category');
+
+    document.getElementById('skillName').value = name;
+    document.getElementById('skillLevel').value = level;
     document.getElementById('skillCategory').value = category;
+
     updateSkillPreview();
-    
     modal.style.display = 'flex';
 }
 
-// Close skill modal
+// Close modal
 function closeSkillModal() {
-    const modal = document.getElementById('skillModal');
-    modal.style.display = 'none';
+    document.getElementById('skillModal').style.display = 'none';
     editingSkill = null;
 }
 
@@ -171,81 +156,68 @@ function saveSkill() {
     const skillName = document.getElementById('skillName').value.trim();
     const skillLevel = document.getElementById('skillLevel').value;
     const skillCategory = document.getElementById('skillCategory').value;
-    
-    if (!skillName) {
-        alert('Please enter a skill name');
-        return;
-    }
-    
+
+    if (!skillName) return alert('Please enter a skill name');
+
     if (editingSkill) {
-        // Update existing skill
         editingSkill.innerHTML = `
             ${skillName}
-            <span class="skill-level-badge">${skillLevel.charAt(0).toUpperCase() + skillLevel.slice(1)}</span>
+            <span class="skill-level-badge">
+                ${skillLevel.charAt(0).toUpperCase() + skillLevel.slice(1)}
+            </span>
         `;
         editingSkill.setAttribute('data-level', skillLevel);
         editingSkill.setAttribute('data-category', skillCategory);
-        
-        // Re-add click event
-        editingSkill.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openEditSkillModal(editingSkill);
-        });
-        
+
         showNotification('Skill updated successfully!', 'success');
+
     } else {
-        // Create new skill element
-        const skillElement = document.createElement('span');
-        skillElement.className = 'skill-tag';
-        skillElement.innerHTML = `
+        const newSkill = document.createElement('span');
+        newSkill.className = 'skill-tag';
+        newSkill.setAttribute('data-level', skillLevel);
+        newSkill.setAttribute('data-category', skillCategory);
+
+        newSkill.innerHTML = `
             ${skillName}
-            <span class="skill-level-badge">${skillLevel.charAt(0).toUpperCase() + skillLevel.slice(1)}</span>
+            <span class="skill-level-badge">
+                ${skillLevel.charAt(0).toUpperCase() + skillLevel.slice(1)}
+            </span>
         `;
-        
-        // Add data attributes for filtering
-        skillElement.setAttribute('data-level', skillLevel);
-        skillElement.setAttribute('data-category', skillCategory);
-        
-        // Add click event for editing
-        skillElement.addEventListener('click', (e) => {
+
+        newSkill.addEventListener('click', (e) => {
             e.stopPropagation();
-            openEditSkillModal(skillElement);
+            openEditSkillModal(newSkill);
         });
-        
-        document.getElementById('studentSkillsList').appendChild(skillElement);
-        
-        // Update skills count
-        const skillsCount = document.getElementById('studentSkills');
-        skillsCount.textContent = parseInt(skillsCount.textContent) + 1;
-        
+
+        document.getElementById('studentSkillsList').appendChild(newSkill);
+
+        const count = document.getElementById('studentSkills');
+        count.textContent = parseInt(count.textContent) + 1;
+
         showNotification('Skill added successfully!', 'success');
     }
-    
-    // Close modal
+
     closeSkillModal();
 }
 
 // Delete skill
 function deleteSkill() {
     if (!editingSkill) return;
-    
+
     if (confirm('Are you sure you want to delete this skill?')) {
         editingSkill.remove();
-        
-        // Update skills count
-        const skillsCount = document.getElementById('studentSkills');
-        skillsCount.textContent = parseInt(skillsCount.textContent) - 1;
-        
+
+        const count = document.getElementById('studentSkills');
+        count.textContent = parseInt(count.textContent) - 1;
+
         showNotification('Skill deleted successfully!', 'success');
         closeSkillModal();
     }
 }
 
-// Add click events to existing skills
+// Add listeners for existing skills
 function initializeExistingSkills() {
-    const existingSkills = document.querySelectorAll('#studentSkillsList .skill-tag');
-    existingSkills.forEach(skill => {
-        // Add click event for editing
+    document.querySelectorAll('#studentSkillsList .skill-tag').forEach(skill => {
         skill.addEventListener('click', (e) => {
             e.stopPropagation();
             openEditSkillModal(skill);
@@ -253,29 +225,155 @@ function initializeExistingSkills() {
     });
 }
 
-// Show notification
+// Notification system
 function showNotification(message, type = 'info') {
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    // Animate in
+    const box = document.createElement('div');
+    box.className = `notification ${type}`;
+    box.textContent = message;
+
+    document.body.appendChild(box);
+    setTimeout(() => box.classList.add('show'), 50);
+
     setTimeout(() => {
-        notification.classList.add('show');
-    }, 100);
-    
-    // Remove after 3 seconds
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => {
-            document.body.removeChild(notification);
-        }, 300);
-    }, 3000);
+        box.classList.remove('show');
+        setTimeout(() => box.remove(), 300);
+    }, 2800);
 }
 
-// Event Listeners
+// 🌟 CLEANED NETWORK FILTERS (SEARCH REMOVED)
+function initializeNetworkFilters() {
+    const searchInput = null;      // removed search box
+    const clearSearchBtn = null;   // removed clear button
+
+    const departmentFilter = document.getElementById('departmentFilter');
+    const skillsFilter = document.getElementById('skillsFilter');
+    const roleFilter = document.getElementById('roleFilter');
+    const yearFilter = document.getElementById('yearFilter');
+    const applyFiltersBtn = document.getElementById('applyFiltersBtn');
+    const resetFiltersBtn = document.getElementById('resetFiltersBtn');
+
+    const profileCards = document.querySelectorAll('#network-page .profile-card');
+
+    let activeFilters = {
+        search: "",
+        department: "",
+        skills: "",
+        role: "",
+        year: ""
+    };
+
+    function applyFilters() {
+
+        const departmentValue = departmentFilter.value.toLowerCase();
+        const skillsValue = skillsFilter.value.toLowerCase();
+        const roleValue = roleFilter.value;
+        const yearValue = yearFilter.value;
+
+        activeFilters = {
+            search: "",
+            department: departmentValue,
+            skills: skillsValue,
+            role: roleValue,
+            year: yearValue
+        };
+
+        let visibleCount = 0;
+
+        profileCards.forEach(card => {
+            let shouldShow = true;
+
+            const name = card.querySelector('.profile-name').textContent.toLowerCase();
+            const title = card.querySelector('.profile-title').textContent.toLowerCase();
+            const department = card.getAttribute('data-department');
+            const role = card.getAttribute('data-role');
+            const year = card.getAttribute('data-year');
+            const skills = card.getAttribute('data-skills');
+
+            if (departmentValue && department !== departmentValue) shouldShow = false;
+            if (skillsValue && !skills.includes(skillsValue)) shouldShow = false;
+            if (roleValue && role !== roleValue) shouldShow = false;
+            if (yearValue && year !== yearValue) shouldShow = false;
+
+            card.style.display = shouldShow ? 'block' : 'none';
+
+            if (shouldShow) visibleCount++;
+        });
+
+        document.getElementById('resultsCount').textContent =
+            `${visibleCount} profile${visibleCount !== 1 ? 's' : ''}`;
+    }
+
+    window.resetFilters = function() {
+        departmentFilter.value = "";
+        skillsFilter.value = "";
+        roleFilter.value = "";
+        yearFilter.value = "";
+        activeFilters.search = "";
+
+        applyFilters();
+    };
+
+    applyFiltersBtn.addEventListener('click', applyFilters);
+    resetFiltersBtn.addEventListener('click', window.resetFilters);
+
+    applyFilters();
+}
+
+// Connect buttons in Network Page (center profiles)
+function initializeConnectButtons() {
+    const connectButtons = document.querySelectorAll('#network-page .btn-primary');
+
+    connectButtons.forEach(button => {
+        if (!button.hasAttribute('data-initialized')) {
+            button.setAttribute('data-initialized', 'true');
+
+            button.addEventListener('click', function() {
+                const profileCard = this.closest('.profile-card');
+                const profileName = profileCard.querySelector('.profile-name').textContent;
+
+                this.innerHTML = '<i class="fas fa-check"></i> Request Sent';
+                this.classList.remove('btn-primary');
+                this.classList.add('btn-outline');
+                this.disabled = true;
+
+                showNotification(`Connection request sent to ${profileName}`, 'success');
+            });
+        }
+    });
+}
+
+// 🌟 NEW: Mentorship Corner Buttons
+function initializeMentorshipButtons() {
+    const mentorshipButtons = document.querySelectorAll('.mentorship-list .btn');
+
+    mentorshipButtons.forEach(btn => {
+        if (!btn.hasAttribute('data-initialized')) {
+            btn.setAttribute('data-initialized', 'true');
+
+            btn.addEventListener('click', function () {
+                const mentorName = this.closest('.mentor-item')
+                    .querySelector('.post-user').textContent;
+
+                this.innerHTML = '<i class="fas fa-check"></i> Requested';
+                this.classList.remove('btn-outline');
+                this.classList.add('btn-primary');
+                this.style.opacity = '0.7';
+                this.disabled = true;
+
+                showNotification(`Request sent to ${mentorName}`, 'success');
+            });
+        }
+    });
+}
+
+// Network page initializer
+function initializeNetworkPage() {
+    initializeNetworkFilters();
+    initializeConnectButtons();
+    initializeMentorshipButtons();
+}
+
+// Navigation + Login Logic
 loginBtn.addEventListener('click', handleLogin);
 logoutBtn.addEventListener('click', handleLogout);
 
@@ -292,19 +390,16 @@ navLinks.forEach(link => {
         e.preventDefault();
         const page = e.target.getAttribute('data-page');
         showPage(page);
-        
-        // Update active nav link
+
         navLinks.forEach(nav => nav.classList.remove('active'));
         e.target.classList.add('active');
     });
 });
 
-// Functions
+// Show page
 function showPage(pageId) {
-    pages.forEach(page => {
-        page.classList.remove('active');
-    });
-    
+    pages.forEach(page => page.classList.remove('active'));
+
     if (pageId === 'dashboard') {
         if (currentRole === 'student') {
             document.getElementById('student-dashboard').classList.add('active');
@@ -313,51 +408,47 @@ function showPage(pageId) {
         }
     } else {
         document.getElementById(`${pageId}-page`).classList.add('active');
+
+        if (pageId === 'network') {
+            setTimeout(initializeNetworkPage, 100);
+        }
+        if (pageId === 'dashboard' && currentRole === 'student') {
+            setTimeout(initializeExistingSkills, 100);
+        }
     }
 }
 
 function handleLogin() {
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-    
-    if (!email || !password) {
-        alert('Please fill in all fields');
-        return;
-    }
-    
-    // Check demo accounts
+
+    if (!email || !password) return alert('Please fill in all fields');
+
     if (email === demoAccounts[currentRole].email && password === demoAccounts[currentRole].password) {
         currentUser = demoAccounts[currentRole];
         showDashboard();
-        alert(`Welcome ${currentUser.name}!`);
+        showNotification(`Welcome ${currentUser.name}!`, 'success');
     } else {
         alert('Invalid email or password. Use the demo accounts provided.');
     }
 }
 
 function showDashboard() {
-    // Show main header and footer
     mainHeader.classList.remove('hidden');
     mainFooter.classList.remove('hidden');
-    
-    // Hide login page
+
     document.getElementById('login-page').classList.remove('active');
-    
-    // Show appropriate dashboard
+
     if (currentRole === 'student') {
         document.getElementById('student-dashboard').classList.add('active');
         document.getElementById('studentName').textContent = currentUser.name;
         document.getElementById('studentTitle').textContent = currentUser.title;
         adminTab.classList.add('hidden');
-        
-        // Initialize existing skills with click events
-        setTimeout(initializeExistingSkills, 100);
     } else {
         document.getElementById('admin-dashboard').classList.add('active');
         adminTab.classList.remove('hidden');
     }
-    
-    // Update navigation
+
     navLinks.forEach(link => link.classList.remove('active'));
     document.querySelector('[data-page="dashboard"]').classList.add('active');
 }
@@ -366,41 +457,37 @@ function handleLogout() {
     currentUser = null;
     mainHeader.classList.add('hidden');
     mainFooter.classList.add('hidden');
-    
-    // Show login page
+
     pages.forEach(page => page.classList.remove('active'));
     document.getElementById('login-page').classList.add('active');
-    
-    // Reset form
+
     document.getElementById('loginEmail').value = '';
     document.getElementById('loginPassword').value = '';
 }
 
-// Animate progress bars on page load
 window.addEventListener('load', () => {
     document.querySelectorAll('.progress').forEach(progress => {
         const width = progress.style.width;
         progress.style.width = '0';
-        setTimeout(() => {
-            progress.style.width = width;
-        }, 500);
+        setTimeout(() => progress.style.width = width, 500);
     });
-    
-    // Create skill modal
+
     createSkillModal();
+
+    //ensures eidting of already existing skills
+    initializeExistingSkills();
+
 });
 
-// Add skill functionality for student
 document.getElementById('addStudentSkillBtn').addEventListener('click', openSkillModal);
 
-// Edit profile functionality
 document.getElementById('editStudentProfileBtn').addEventListener('click', () => {
     const name = prompt('Enter your name:', currentUser.name);
     if (name) {
         currentUser.name = name;
         document.getElementById('studentName').textContent = name;
     }
-    
+
     const title = prompt('Enter your title:', currentUser.title);
     if (title) {
         currentUser.title = title;
@@ -408,22 +495,17 @@ document.getElementById('editStudentProfileBtn').addEventListener('click', () =>
     }
 });
 
-// Connect GitHub functionality
 document.getElementById('connectStudentGithubBtn').addEventListener('click', () => {
-    alert('GitHub integration would be implemented here. For demo purposes, we\'re showing sample data.');
+    alert('GitHub integration would be implemented here. For demo purposes, sample data is shown.');
 });
 
-// Explore clubs functionality
 document.getElementById('exploreClubsBtn').addEventListener('click', () => {
     showPage('clubs');
     navLinks.forEach(nav => nav.classList.remove('active'));
     document.querySelector('[data-page="clubs"]').classList.add('active');
 });
 
-// Close modal when clicking outside
 document.addEventListener('click', (e) => {
     const modal = document.getElementById('skillModal');
-    if (e.target === modal) {
-        closeSkillModal();
-    }
+    if (e.target === modal) closeSkillModal();
 });
