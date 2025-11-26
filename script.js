@@ -509,3 +509,27 @@ document.addEventListener('click', (e) => {
     const modal = document.getElementById('skillModal');
     if (e.target === modal) closeSkillModal();
 });
+
+// Accept connection request
+function acceptRequest(button) {
+    const requestItem = button.closest('.request-item');
+    const name = requestItem.querySelector('.post-user').textContent;
+
+    // Remove item
+    requestItem.style.opacity = "0";
+    setTimeout(() => requestItem.remove(), 300);
+
+    showNotification(`You are now connected with ${name}`, 'success');
+}
+
+// Decline connection request
+function declineRequest(button) {
+    const requestItem = button.closest('.request-item');
+    const name = requestItem.querySelector('.post-user').textContent;
+
+    // Remove item
+    requestItem.style.opacity = "0";
+    setTimeout(() => requestItem.remove(), 300);
+
+    showNotification(`You declined ${name}'s request`, 'error');
+}
