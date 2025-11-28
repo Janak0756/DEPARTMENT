@@ -1212,3 +1212,72 @@ footer {
         opacity: 1;
     }
 }
+
+.club-card-custom {
+    padding: 12px;
+    border-radius: 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    margin-bottom: 12px;
+}
+
+
+/* Projects Collaboration specific */
+.projects-page { padding-bottom: 30px; }
+
+.project-card-custom {
+  padding: 15px;
+  border-radius: 12px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  margin-bottom: 12px;
+}
+
+.project-meta {
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+
+.project-owner {
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+
+.project-owner .avatar {
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,var(--primary),var(--accent));
+  color:white;
+  font-weight:700;
+}
+
+.request-card {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  margin-bottom: 10px;
+  background: var(--light);
+}
+
+.request-actions { display:flex; gap:8px; margin-top:10px; align-items:center; }
+
+.request-actions .small-btn {
+  padding:6px 10px;
+  font-size:0.85rem;
+}
+
+#incomingRequestsList .no-requests { color:var(--gray); padding:10px; }
+
+.req-skills-text {
+    margin-top: 10px;
+    font-size: 0.85rem;
+    color: var(--dark);
+}
+
